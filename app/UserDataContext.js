@@ -7,7 +7,7 @@ const UserDataContext = React.createContext();
 export default UserDataContext;
 
 export const UserDataProvider = ({ children }) => {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState({});
 
   return (
     <UserDataContext.Provider value={{ userData, setUserData }}>
