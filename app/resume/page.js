@@ -25,6 +25,9 @@ export default function Resume() {
     // if (JSON.stringify(userData) === "{}") {
     //     return <ErrorPage />;
     // }
+    if(!userData) {
+      return <div>Error: not user data...</div>
+    }
 
     return (
         <div className="font-spaceGrotesk box-border m-0 p-0">
