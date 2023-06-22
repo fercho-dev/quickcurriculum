@@ -22,11 +22,8 @@ export default function Resume() {
     };
 
     //👇🏻 returns an error page if the userData object is empty
-    // if (JSON.stringify(userData) === "{}") {
-    //     return <ErrorPage />;
-    // }
-    if(!userData) {
-      return <div>Error: not user data...</div>
+    if (JSON.stringify(userData) === "{}") {
+        return <div>Error: not userData</div>;
     }
 
     return (
