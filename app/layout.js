@@ -5,7 +5,7 @@ import { UserDataProvider } from './UserDataContext'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'CVPal',
+  title: 'Fast CV',
   description: 'Genera un curriculum en segundos con ChatGPT',
 }
 
