@@ -134,7 +134,8 @@ export default function Form() {
         return <p>Loading...</p>;
     }
   return (
-    <div className='app mx-auto flex flex-col items-center justify-center min-h-screen bg-purple-50 text-neutral-900 pt-8 pb-11'>
+    <div className='app mx-auto flex flex-col items-center justify-center min-h-screen bg-purple-50 text-neutral-900 font-sans pt-8 pb-11 px-2'>
+            <p className='mb-5 mt-5 text-xl md:text-2xl'>Ingresa tus datos y obten tu CV</p>
             <form
                 onSubmit={handleFormSubmit}
                 method='POST'
@@ -153,7 +154,7 @@ export default function Form() {
                 />
                 <div className='nestedContainer flex flex-col space-y-5'>
                     <div>
-                        <label htmlFor='currentPosition' className='font-bold mb-1'>Tu rol actual:</label>
+                        <label htmlFor='currentPosition' className='font-medium mb-1'>Tu rol actual:</label>
                         <input
                             type='text'
                             required
@@ -164,7 +165,7 @@ export default function Form() {
                         />
                     </div>
                     <div>
-                        <label htmlFor='currentLength' className='font-bold mb-1'>¿Cuánto tiempo llevas en este rol? (años)</label>
+                        <label htmlFor='currentLength' className='font-medium mb-1'>¿Cuánto tiempo llevas en este rol? (años)</label>
                         <input
                             type='number'
                             required
@@ -175,7 +176,7 @@ export default function Form() {
                         />
                     </div>
                     <div>
-                        <label htmlFor='currentTechnologies' className='font-bold mb-1 mr-2'>Tecnologias que usas:</label>
+                        <label htmlFor='currentTechnologies' className='font-medium mb-1 mr-2'>Tecnologias que usas:</label>
                         <input
                             type='text'
                             required
@@ -187,11 +188,11 @@ export default function Form() {
                     </div>
                 </div>
                 <div>
-                    <h3 className='text-xl font-bold my-4'>Empresas en las que has trabajado:</h3>
+                    <h3 className='text-xl font-semibold my-4'>Empresas en las que has trabajado:</h3>
                     {companyInfo.map((company, index) => (
                     <div className='nestedContainer flex flex-col space-y-5' key={index}>
                         <div className='companies'>
-                            <label htmlFor='name' className='font-bold mb-1'>Empresa:</label>
+                            <label htmlFor='name' className='font-medium mb-1'>Empresa:</label>
                             <input
                                 type='text'
                                 name='name'
@@ -201,7 +202,7 @@ export default function Form() {
                             />
                         </div>
                         <div className='companies'>
-                            <label htmlFor='position' className='font-bold mb-1'>Rol:</label>
+                            <label htmlFor='position' className='font-medium mb-1'>Rol:</label>
                             <input
                                 type='text'
                                 name='position'
@@ -230,7 +231,7 @@ export default function Form() {
                 </div>
 
                 <div className="mt-6">
-                    <label htmlFor='resumeLanguage' className='block text-sm font-medium text-gray-700'>
+                    <label htmlFor='resumeLanguage' className='block text-m font-medium text-gray-700'>
                         ¿En qué idioma quieres tu curriculum?
                     </label>
                     <select
@@ -246,7 +247,7 @@ export default function Form() {
                     </select>
                 </div>
 
-                <button type="submit" className='w-full py-3 px-4 bg-purple-600 text-white font-bold rounded hover:bg-purple-800 mt-5'>
+                <button type="submit" className='w-full py-3 px-4 bg-purple-600 shadow-md shadow-orange-300 text-white font-bold rounded hover:bg-purple-800 mt-5'>
                   CREAR CV
                 </button>
             </form>
