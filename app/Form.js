@@ -135,7 +135,7 @@ export default function Form() {
     }
   return (
     <div className='app mx-auto flex flex-col items-center justify-center min-h-screen bg-purple-50 text-neutral-900 font-sans pt-8 pb-11 px-2'>
-            <p className='mb-5 mt-5 text-xl md:text-2xl'>Ingresa tus datos y obten tu CV</p>
+            <p className='mb-9 mt-5 text-xl md:text-2xl font-medium text-purple-600'>Ingresa tus datos y obten tu CV</p>
             <form
                 onSubmit={handleFormSubmit}
                 method='POST'
