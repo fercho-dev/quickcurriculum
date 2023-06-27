@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import React, { useState, useEffect } from "react";
 import { useChat } from 'ai/react'
 import UserDataContext from './UserDataContext';
+import LoadingSkeleton from './LoadingSkeleton';
 
 export default function Form() {
   const { messages, append, stop, isLoading } = useChat({api: '/api/chat'})
@@ -131,7 +132,7 @@ export default function Form() {
 
     //👇🏻 Renders the Loading component you submit the form
     if (isLoading) {
-        return <p>Loading...</p>;
+        return <LoadingSkeleton />;
     }
   return (
     <div className='app mx-auto flex flex-col items-center justify-center min-h-screen bg-purple-50 text-neutral-900 font-sans pt-8 pb-11 px-2'>

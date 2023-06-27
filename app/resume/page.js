@@ -2,10 +2,14 @@
 import React, { useContext, useRef } from 'react';
 import UserDataContext from '../UserDataContext';
 import { useReactToPrint } from "react-to-print";
+import { useRouter } from 'next/navigation'
+import { Document, Page, Text, View, PDFDownloadLink, StyleSheet } from '@react-pdf/renderer';
+import MyDoc from './MyDoc';
 
 export default function Resume() {
   const { userData } = useContext(UserDataContext);
   console.log(userData)
+  const router = useRouter()
   
   const componentRef = useRef();
 
@@ -23,15 +27,31 @@ export default function Resume() {
 
     //👇🏻 returns an error page if the userData object is empty
     if (JSON.stringify(userData) === "{}") {
-        return <div>Error: not userData</div>;
+        return <div className="flex flex-col items-center justify-center h-screen">
+          <p className="text-red-500 text-lg font-bold mb-4">Error: inserta tus datos correctamente de nuevo</p>
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={
+              // Navigate back to the home page
+              () => router.push('/')
+            }
+          >
+            Vuelve al inicio
+          </button>
+        </div>
     }
 
     return (
         <div className="font-spaceGrotesk box-border m-0 p-0">
             <button onClick={handlePrint}
-              className="py-4 cursor-pointer outline-none bg-[#5d3891] border-none text-white text-lg font-bold rounded-md"
+              className="mx-5 my-5 py-4 px-2 cursor-pointer outline-none bg-[#5d3891] border-none text-white text-lg font-bold rounded-md"
             >
-              Print Page
+              Imprimir
+            </button>
+            <button className="mx-5 my-5 py-4 px-2 cursor-pointer outline-none bg-[#5d3891] border-none text-white text-lg font-bold rounded-md">
+              <PDFDownloadLink document={<MyDoc userData={userData} />} fileName={`${userData.fullName}_Resume.pdf`}>
+                {({ loading }) => (loading ? 'Loading document...' : 'Descargar como PDF')}
+              </PDFDownloadLink>
             </button>
             <main className='container min-h-screen p-8' ref={componentRef}>
                 <header className='header w-4/5 m-auto min-h-[10vh] bg-[#e8e2e2] p-8 rounded-t-md flex items-center justify-between'>
