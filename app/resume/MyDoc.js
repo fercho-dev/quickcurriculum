@@ -1,60 +1,167 @@
-import { Document, Page, Text, View, PDFDownloadLink, StyleSheet } from '@react-pdf/renderer';
+import React from 'react';
+import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 
-// Create styles for PDF
+// Create styles
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    textAlign: 'center',
-    marginBottom: 20,
+  header: {
+    width: '100%',
+    minHeight: 72,
+    backgroundColor: '#4D7CF0',
+    padding: 32,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between'
   },
-  body: {
+  page: {
+    height: '100%',
+    width: '100%',
+    padding: 32,
+  },
+  title: {
+    textTransform: 'uppercase',
+    fontWeight: 'bold',
+    color: '#ffffff', 
+    fontSize: 24,
+    marginBottom: 5
+  },
+  fullname: {
+    textTransform: 'uppercase',
+    fontSize: 18,
+    fontWeight: 'normal',
+    color: '#ffffff',
+    marginBottom: 16,
+  },
+  yearsofexperience: {
+    fontSize: 12,
+    color: '#D1D5DB',
+  },
+  infocontainer: {
+    width: '100%',
+    padding: 32,
+    minHeight: 576,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#e0e0ea',
+  },
+  aboutcontainer: {
+    marginLeft: 24,
+    marginRight: 24,
+  },
+  about: {
+    marginBottom: 8,
+    fontSize: 18,
+  },
+  abouttext: {
+    textAlign: 'justify',
+    marginBottom: 32,
+    fontSize: 13,
+  },
+  twoColumn: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginLeft: 48,
+    marginRight: 48,
+  },
+  column1: {
+    marginBottom: 48,
+  },
+  column2: {
+    maxWidth: '60%',
+  },
+  sectionleft: {
+    marginBottom: 48,
+  },
+  subTitle: {
+    marginBottom: 8,
+    fontSize: 15,
+  },
+  list: {
+    marginLeft: 28,
+  },
+  listItem: {
+    textTransform: 'capitalize',
+    fontSize: 10,
+    marginLeft: 0
+  },
+  companycontainer: {
+    marginBottom: 24,
+  },
+  companyname: {
+    fontWeight: 'bold',
+    textTransform: 'capitalize',
     fontSize: 14,
   },
-  header: {
+  companyrole: {
+    fontWeight: '500',
+    textTransform: 'capitalize',
     fontSize: 12,
-    marginBottom: 40,
-    textAlign: 'center',
-    color: 'grey',
   },
+  companydescription: {
+    fontSize: 10,
+  }
 });
 
-// Create Document Component
-const MyDoc = ({ userData }) => (
+const MyDoc = ({ userData, workExperience }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <Text style={styles.header} fixed>
-        {userData.fullName}
-      </Text>
-      <Text style={styles.title}>{userData.currentPosition} ({userData.currentTechnologies})</Text>
-      <Text style={styles.body}>{userData.currentLength} year(s) work experience</Text>
-      
-      <Text style={styles.title}>PROFILE SUMMARY</Text>
-      {userData.objective.split("\n").map((line, i) => (
-        <Text style={styles.body} key={i}>
-          {line}
-        </Text>
-      ))}
+      <View style={styles.header}>
+        <Text style={styles.title}>{userData.currentPosition}</Text>
+        <Text style={styles.fullname}>{userData.fullName}</Text>
+        <Text style={styles.yearsofexperience}>{`${userData.yearsOfExperience} year(s) work experience`}</Text>
+      </View>
 
-      <Text style={styles.title}>WORK HISTORY</Text>
-      {userData.workHistory.map((work, i) => (
-        <Text key={i} style={styles.body}>
-          {work.name} - {work.position}
-        </Text>
-      ))}
+      <View style={styles.infocontainer}>
+        <View style={styles.aboutcontainer}>
+          <Text style={styles.about}>• About</Text>
+          <Text style={styles.abouttext}>{userData.bio}</Text>
+        </View>
 
-      <Text style={styles.title}>JOB PROFILE</Text>
-      {userData.jobResponsibilities.split("\n").map((line, i) => (
-        <Text style={styles.body} key={i}>
-          {line}
-        </Text>
-      ))}
+        <View style={styles.twoColumn}>
+          <View style={styles.column1}>
+            <View style={styles.sectionleft}>
+              <Text style={styles.subTitle}>• Technical Skills</Text>
+              <View style={styles.list}>
+                {userData.technologiesList.split(', ').map((skill, index) => (
+                  <Text style={styles.listItem} key={index}>• {skill}</Text>
+                ))}
+              </View>
+            </View>
 
-      <Text style={styles.title}>JOB RESPONSIBILITIES</Text>
-      {userData.keypoints.split("\n").map((line, i) => (
-        <Text style={styles.body} key={i}>
-          {line}
-        </Text>
-      ))}
+            <View style={styles.sectionleft}>
+              <Text style={styles.subTitle}>• Soft Skills</Text>
+              <View style={styles.list}>
+                {userData.softSkillsList.split(', ').map((skill, index) => (
+                  <Text style={styles.listItem} key={index}>• {skill}</Text>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.sectionleft}>
+              <Text style={styles.subTitle}>• Languages</Text>
+              <View style={styles.list}>
+                {userData.languagesList.split(', ').map((skill, index) => (
+                  <Text style={styles.listItem} key={index}>• {skill}</Text>
+                ))}
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.column2}>
+            <Text style={styles.subTitle}>• Work Experience</Text>
+            {workExperience.map((item, index) => (
+              <View key={index} style={styles.companycontainer}>
+                <Text style={styles.companyname}>{item.name}</Text>
+                <Text style={styles.companyrole}>{item.position}</Text>
+                <View>
+                  {item.achievementsAndResponsibilities.map((achievement, achievementIndex) => (
+                    <Text style={styles.companydescription} key={achievementIndex}>• {achievement}</Text>
+                  ))}
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
     </Page>
   </Document>
 );

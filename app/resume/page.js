@@ -3,106 +3,131 @@ import React, { useContext, useRef } from 'react';
 import UserDataContext from '../UserDataContext';
 import { useReactToPrint } from "react-to-print";
 import { useRouter } from 'next/navigation'
-import { Document, Page, Text, View, PDFDownloadLink, StyleSheet } from '@react-pdf/renderer';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import MyDoc from './MyDoc';
 
 export default function Resume() {
   const { userData } = useContext(UserDataContext);
   console.log(userData)
+
   const router = useRouter()
   
   const componentRef = useRef();
 
-    // PRINTING THE PAGE
-    const handlePrint = useReactToPrint({
-        content: () => componentRef.current,
-        documentTitle: `${userData.fullName} Resume`,
-        onAfterPrint: () => alert("Print Successful!"),
-    });
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    documentTitle: `${userData.fullName} Resume`,
+    onAfterPrint: () => alert("Print Successful!"),
+  });
+
+  //👇🏻 returns an error page if the userData object is empty
+  if (JSON.stringify(userData) === "{}") {
+    return <div className="flex flex-col items-center justify-center h-screen">
+      <p className="text-red-500 text-lg font-bold mb-4">Error: inserta tus datos correctamente de nuevo</p>
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={
+          // Navigate back to the home page
+          () => router.push('/')
+        }
+      >
+        Vuelve al inicio
+      </button>
+    </div>
+  }
+
+  const workExperience = JSON.parse(userData.companiesInfo)
 
     //👇🏻 function that replaces the new line with a break tag
-    const replaceWithBr = (string) => {
-        return string.replace(/\n/g, "<br />");
-    };
-
-    //👇🏻 returns an error page if the userData object is empty
-    if (JSON.stringify(userData) === "{}") {
-        return <div className="flex flex-col items-center justify-center h-screen">
-          <p className="text-red-500 text-lg font-bold mb-4">Error: inserta tus datos correctamente de nuevo</p>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={
-              // Navigate back to the home page
-              () => router.push('/')
-            }
-          >
-            Vuelve al inicio
-          </button>
-        </div>
-    }
+    // const replaceWithBr = (string) => {
+    //     return string.replace(/\n/g, "<br />");
+    // };
 
     return (
         <div className="font-spaceGrotesk box-border m-0 p-0">
             <button onClick={handlePrint}
-              className="mx-5 my-5 py-4 px-2 cursor-pointer outline-none bg-[#5d3891] border-none text-white text-lg font-bold rounded-md"
+              className="ml-6 mx-2 my-5 py-2 md:py-4 px-2 cursor-pointer outline-none bg-purple-600 border-none text-white text-sm md:text-lg font-semibold rounded-md"
             >
               Imprimir
             </button>
-            <button className="mx-5 my-5 py-4 px-2 cursor-pointer outline-none bg-[#5d3891] border-none text-white text-lg font-bold rounded-md">
-              <PDFDownloadLink document={<MyDoc userData={userData} />} fileName={`${userData.fullName}_Resume.pdf`}>
+
+            <button className="mx-2 my-5 py-2 md:py-4 px-2 cursor-pointer outline-none bg-purple-600 border-none text-white text-sm md:text-lg font-semibold rounded-md">
+              <PDFDownloadLink document={<MyDoc userData={userData} workExperience={workExperience} />} fileName={`${userData.fullName}_Resume.pdf`}>
                 {({ loading }) => (loading ? 'Loading document...' : 'Descargar como PDF')}
               </PDFDownloadLink>
             </button>
-            <main className='container min-h-screen p-8' ref={componentRef}>
-                <header className='header w-4/5 m-auto min-h-[10vh] bg-[#e8e2e2] p-8 rounded-t-md flex items-center justify-between'>
+
+            <main className='min-h-screen min-w-screen p-2 md:p-8' ref={componentRef}>
+                <header className='w-4/5 m-auto min-h-[10vh] bg-blue-500 p-8 rounded-t-md flex items-center justify-between'>
                     <div>
-                        <h1 className='font-bold text-3xl'>{userData.fullName}</h1>
-                        <p className='resumeTitle headerTitle text-sm text-gray-600 mb-4'>
-                            {userData.currentPosition} ({userData.currentTechnologies})
+                        <h1 className='subpixel-antialiased capitalize font-semibold md:font-medium text-white text-base md:text-5xl mb-1'>{userData.currentPosition}</h1>
+                        <p className=' capitalize text-sm md:text-2xl font-normal text-white mb-2 md:mb-4'>
+                            {userData.fullName}
                         </p>
-                        <p className='resumeTitle text-sm text-gray-600'>
-                            {userData.currentLength}year(s) work experience
+                        <p className='text-xs md:text-base text-gray-300'>
+                            {userData.yearsOfExperience} year(s) work experience
                         </p>
                     </div>
                     <div>
                     </div>
                 </header>
-                <div className='resumeBody w-4/5 m-auto p-8 min-h-[80vh] border-[1px] border-[#e0e0ea]'>
-                    <div>
-                        <h2 className='resumeBodyTitle mb-2 text-2xl'>PROFILE SUMMARY</h2>
-                        <p
-                            dangerouslySetInnerHTML={{
-                                __html: replaceWithBr(userData.objective),
-                            }}
-                            className='resumeBodyContent text-justify mb-8'
-                        />
+                <div className='w-4/5 m-auto p-8 min-h-[80vh] border-[1px] border-[#e0e0ea]'>
+                    <div className='md:mx-6'>
+                        <h2 className='mb-2 text-lg md:text-3xl'>• About</h2>
+                        <p className='text-justify mb-8 text-xs md:text-lg'>
+                            {userData.bio}
+                        </p>
                     </div>
-                    <div>
-                        <h2 className='resumeBodyTitle mb-2 text-2xl'>WORK HISTORY</h2>
-                        {userData.workHistory.map((work) => (
-                            <p className='resumeBodyContent text-justify mb-8' key={work.name}>
-                                <span className="font-bold">{work.name}</span> -{" "}
-                                {work.position}
-                            </p>
-                        ))}
-                    </div>
-                    <div>
-                        <h2 className='resumeBodyTitle mb-2 text-2xl'>JOB PROFILE</h2>
-                        <p
-                            dangerouslySetInnerHTML={{
-                                __html: replaceWithBr(userData.jobResponsibilities),
-                            }}
-                            className='resumeBodyContent text-justify mb-8'
-                        />
-                    </div>
-                    <div>
-                        <h2 className='resumeBodyTitle mb-2 text-2xl'>JOB RESPONSIBILITIES</h2>
-                        <p
-                            dangerouslySetInnerHTML={{
-                                __html: replaceWithBr(userData.keypoints),
-                            }}
-                            className='resumeBodyContent text-justify mb-8'
-                        />
+                    <div className='flex flex-col md:flex-row md:justify-between md:mx-12'>
+                      <div className='justify-self-start mb-12'>
+                        <div className='mb-12'>
+                          <h2 className='mb-2 text-lg md:text-2xl'>• Technical Skills</h2>
+                          <ul className='list-disc ml-8'>
+                            {userData.technologiesList.split(', ').map((skill, index) => (
+                              <li className='capitalize text-sm md:text-base' key={index}>{skill}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className='mb-12'>
+                          <h2 className='mb-2 text-lg md:text-2xl'>• Soft Skills</h2>
+                            <ul className='list-disc ml-8'>
+                              {userData.softSkillsList.split(', ').map((skill, index) => (
+                                <li className='capitalize text-sm md:text-base' key={index}>{skill}</li>
+                              ))}
+                            </ul>
+                        </div>
+                        <div className='mb-12'>
+                          <h2 className='mb-2 text-lg md:text-2xl'>• Languages</h2>
+                            <ul className='list-disc ml-8'>
+                              {userData.languagesList.split(', ').map((skill, index) => (
+                                <li className='capitalize text-sm md:text-base' key={index}>{skill}</li>
+                              ))}
+                            </ul>
+                        </div>
+                      </div>
+                      <div className='justify-self-start md:max-w-[60%]'>
+                        <h2 className='mb-2 text-lg md:text-2xl'>• Work Experience</h2>
+                        {console.log("workexperience", workExperience)}
+                        {workExperience && workExperience.length > 0 ?
+                          workExperience.map((item, index) => (
+                            <div className='mb-6' key={index}>
+                              <h3 className='font-semibold capitalize text-base md:text-lg'>{item.name}</h3>
+                              <p className='font-medium capitalize text-sm md:text-base'>{item.position}</p>
+                              <ul className='list-disc'>
+                                {item.achievementsAndResponsibilities && item.achievementsAndResponsibilities.length > 0 ?
+                                  item.achievementsAndResponsibilities.map((achivement, achivementIndex) => (
+                                    <li className='text-xs md:text-sm' key={achivementIndex}>{achivement}</li>
+                                  ))
+                                  :
+                                  <li>No achievements and responsibilities listed.</li>
+                                }
+                              </ul>
+                            </div>
+                          ))
+                          :
+                          <div>No work experience listed.</div>
+                        }
+                      </div>
                     </div>
                 </div>
             </main>

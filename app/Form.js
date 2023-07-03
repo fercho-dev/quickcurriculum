@@ -9,10 +9,10 @@ import LoadingSkeleton from './LoadingSkeleton';
 export default function Form() {
   const { messages, append, stop, isLoading } = useChat({api: '/api/chat'})
   const [newEntry, setNewEntry] = useState(null);
-  const { setUserData } = React.useContext(UserDataContext);
+  const { setUserData, userData } = React.useContext(UserDataContext);
 
   useEffect(() => {
-    if (messages.length >= 6 && !isLoading) {
+    if (messages.length >= 10 && !isLoading) {
       console.log('ANALYZING MESSAGES')
       console.log('MESSAGES: ', messages)
       messages.forEach((message) => {
@@ -21,27 +21,30 @@ export default function Form() {
           }
       })
 
-      const objective = messages[1].content;
-      const keypoints = messages[3].content;
-      const jobResponsibilities = messages[5].content;
+      const bio = messages[1].content;
+      const companiesInfo = messages[3].content;
+      const softSkillsList = messages[5].content;
+      const languagesList = messages[7].content;
+      const technologiesList = messages[9].content;
 
-      const chatgptData = {objective, keypoints, jobResponsibilities};
+      const chatgptData = {bio, companiesInfo, softSkillsList, languagesList, technologiesList};
       const result = {...newEntry, ...chatgptData};
       console.log('RESULT: ', result);
+
       setUserData(result);
 
       console.log('STOPPING CHAT')
-      stop()
-
-      console.log('REDIRECTING TO RESUME')
-      router.push('/resume')
+      //stop();
+      router.push('/resume');
     }
   }, [messages, isLoading])
  
   const [fullName, setFullName] = useState("");
     const [currentPosition, setCurrentPosition] = useState("");
-    const [currentLength, setCurrentLength] = useState(1);
+    const [yearsOfExperience, setyearsOfExperience] = useState(1);
     const [currentTechnologies, setCurrentTechnologies] = useState("");
+    const [softSkills, setSoftSkills] = useState("");
+    const [languages, setLanguages] = useState("");
     const [resumeLanguage, setResumeLanguage] = useState("");
     const [companyInfo, setCompanyInfo] = useState([
         { name: "", position: "" }
@@ -71,7 +74,7 @@ export default function Form() {
       const {
         fullName,
         currentPosition,
-        currentLength,
+        yearsOfExperience,
         currentTechnologies,
         workHistory, //JSON format
       } = formData;
@@ -84,7 +87,7 @@ export default function Form() {
           id: generateID(),
           fullName,
           currentPosition,
-          currentLength,
+          yearsOfExperience,
           currentTechnologies,
           workHistory: workArray,
       });
@@ -93,24 +96,92 @@ export default function Form() {
       const remainderText = () => {
           let stringText = "";
           for (let i = 0; i < workArray.length; i++) {
-              stringText += ` ${workArray[i].name} as a ${workArray[i].position}.`;
+              stringText += `${workArray[i].name} as a ${workArray[i].position}.\n`;
           }
           return stringText;
       };
       //👇🏻 The job description prompt
-      const prompt1 = `I am writing a resume, my details are \n name: ${fullName} \n role: ${currentPosition} (${currentLength} years). \n I work with these technologies: ${currentTechnologies}. Can you write a 100 words description for the top of the resume(first person writing)?`;
-      //👇🏻 The job responsibilities prompt
-      const prompt2 = `I am writing a resume, my details are \n name: ${fullName} \n role: ${currentPosition} (${currentLength} years). \n I work with these technologies: ${currentTechnologies}. Can you write 10 points for a resume on what I am good at?`;
+      const prompt1 = `
+      You are an expert talent recluiter, with years of experience recluiting and hiring talent.
+
+      I am writing a resume.
+      My details are:
+      - name: ${fullName}
+      - role: ${currentPosition} (${yearsOfExperience} years) 
+      - I work with these technologies: ${currentTechnologies}
+      - My soft skills are: ${softSkills}
+      
+      Write a short description, maximum 75 words, for the top of the resume.
+      Use the necessary keywords to get the atention of recluiters and stand out, but do not overuse them.
+      (write in first person writing)
+
+      Do not use again the information I have already given you. That will be redundant.
+      
+      Avoid using any additional text, write only what I am asking for.
+      Do not use introductory text like "Sure, here is the answer..." or "Of course, this is the response..."
+      Be direct and go straight to the text I am asking for.
+      `;
       //👇🏻 The job achievements prompt
-      const prompt3 = `I am writing a resume, my details are \n name: ${fullName} \n role: ${currentPosition} (${currentLength} years). \n During my years I worked at ${
-          workArray.length
-      } companies. ${remainderText()} \n Can you write me 50 words for each company seperated in numbers of my succession in the company (in first person)?`;
+      const prompt2 = `
+      Now I will give you a list of the companies I have worked for and my role. 
+      Write three bullets points for each company to describe some of the experience I get from that work and enlighten my strengths. Make each bullet point be short, up to 25 words.
+      
+      ${remainderText()}
+
+      Give your response in a json format that can be translated to an javascript object.
+      Ex. [{"name": "company 1", "position": "position 1", "achivementsAndResponsabilites": ["text 1", "text 2", "text 3"]},
+      {"name": "company 2", "position": "position 2", "achivementsAndResponsabilites": ["text 1", "text 2", "text 3"]}]
+      
+      Avoid using any additional text, write only what I am asking for.
+      Do not use introductory text like "Sure, here is the answer..." or "Of course, this is the response..."
+      Be direct and go straight to the text I am asking for.
+
+      Make sure you are using the correct json format to transform to javascript object.
+      A common error is how the json ends. Make sure you are using the correct brackets and the end.
+      The normal end usually is like this: "]}]"
+      `;
+      //👇🏻 The softskills prompt
+      const prompt3 = `
+      Now I will give you a list of my soft skills.
+      If there are in spanish, please translate them to english.
+      If there are more than 5, please select the top 5.
+      If there are less than 5, please add more soft skills that are relevant for a resume.
+      This is the list: ${softSkills}
+      Give your response separated by commas. Ex. "soft skill 1, soft skill 2, soft skill 3, soft skill 4, soft skill 5"
+      Avoid using any additional text, write only what I am asking for.
+      Do not use introductory text like "Sure, here is the answer..." or "Of course, this is the response..."
+      Be direct and go straight to the text I am asking for.
+      Make sure they are five
+      `;
+      //👇🏻 The languages prompt
+      const prompt4 = `
+      Now I will give you a list of my languages.
+      This is the list: ${languages}
+      If they are in spanish, please translate them to english.
+      Give your response separated by commas. Ex. "Englsi, Spanish, French, German"
+      Avoid using any additional text, write only what I am asking for.
+      Do not use introductory text like "Sure, here is the answer..." or "Of course, this is the response..."
+      Be direct and go straight to the text I am asking for.
+      `;
+      //👇🏻 The languages prompt
+      const prompt5 = `
+      Now I will give you a list of technologies.
+      This is the list: ${currentTechnologies}
+      Make sure they are in the next format, if not please change them.
+      This is the format: "JavaScript, HTML, CSS"
+      Give your response separated by commas. Ex. "JavaScript, HTML, CSS"
+      Avoid using any additional text, write only what I am asking for.
+      Do not use introductory text like "Sure, here is the answer..." or "Of course, this is the response..."
+      Be direct and go straight to the text I am asking for.
+      `;
 
       //👇🏻 generate a GPT result
       console.log('STARTING GPT API CALLS')
       await append({"role": "user", "content": prompt1});
       await append({"role": "user", "content": prompt2});
       await append({"role": "user", "content": prompt3});
+      await append({"role": "user", "content": prompt4});
+      await append({"role": "user", "content": prompt5});
       console.log('END OF API CALLS')
     }
 
@@ -121,7 +192,7 @@ export default function Form() {
         const formData = {
             fullName,
             currentPosition,
-            currentLength,
+            yearsOfExperience,
             currentTechnologies,
             workHistory: companyInfo,
         }
@@ -149,6 +220,7 @@ export default function Form() {
                     required
                     name='fullName'
                     id='fullName'
+                    placeholder='Ej. Juan Perez'
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className='w-full mb-5 p-2 border-2 border-purple-200 rounded'
@@ -159,6 +231,7 @@ export default function Form() {
                         <input
                             type='text'
                             required
+                            placeholder='Ej. Frontend Developer'
                             name='currentPosition'
                             className='currentInput w-full p-2 border-2 border-purple-200 rounded'
                             value={currentPosition}
@@ -166,25 +239,50 @@ export default function Form() {
                         />
                     </div>
                     <div>
-                        <label htmlFor='currentLength' className='font-medium mb-1'>¿Cuánto tiempo llevas en este rol? (años)</label>
+                        <label htmlFor='yearsOfExperience' className='font-medium mb-1'>¿Cuánto tiempo llevas en este rol? (años)</label>
                         <input
                             type='number'
                             required
-                            name='currentLength'
+                            name='yearsOfExperience'
                             className='currentInput w-full p-2 border-2 border-purple-200 rounded'
-                            value={currentLength}
-                            onChange={(e) => setCurrentLength(e.target.value)}
+                            value={yearsOfExperience}
+                            onChange={(e) => setyearsOfExperience(e.target.value)}
                         />
                     </div>
                     <div>
-                        <label htmlFor='currentTechnologies' className='font-medium mb-1 mr-2'>Tecnologias que usas:</label>
+                        <label htmlFor='currentTechnologies' className='font-medium mb-1 mr-2'>¿Cuáles son tus habilidades técnicas?</label>
                         <input
                             type='text'
                             required
                             name='currentTechnologies'
+                            placeholder='Ej: JavaScript, React, Node, Python, etc.'
                             className='currentInput w-full p-2 border-2 border-purple-200 rounded'
                             value={currentTechnologies}
                             onChange={(e) => setCurrentTechnologies(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor='softSkills' className='font-medium mb-1 mr-2'>¿Cuáles son tus habilidades blandas? -soft skills-</label>
+                        <input
+                            type='text'
+                            required
+                            name='softSkills'
+                            placeholder='Ej: Proactividad, Trabajo en equipo, etc.'
+                            className='currentInput w-full p-2 border-2 border-purple-200 rounded'
+                            value={softSkills}
+                            onChange={(e) => setSoftSkills(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor='languages' className='font-medium mb-1 mr-2'>¿Qué idiomas hablas?</label>
+                        <input
+                            type='text'
+                            required
+                            name='languages'
+                            placeholder='Ej: Español, Inglés, etc.'
+                            className='currentInput w-full p-2 border-2 border-purple-200 rounded'
+                            value={languages}
+                            onChange={(e) => setLanguages(e.target.value)}
                         />
                     </div>
                 </div>
