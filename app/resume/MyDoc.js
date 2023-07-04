@@ -101,7 +101,14 @@ const styles = StyleSheet.create({
   }
 });
 
-const MyDoc = ({ userData, workExperience }) => (
+const MyDoc = ({ userData, workExperience }) => {
+  userData = userData || {};
+  userData.technologiesList = userData.technologiesList || '';
+  userData.softSkillsList = userData.softSkillsList || '';
+  userData.languagesList = userData.languagesList || '';
+  workExperience = workExperience || [];
+
+  return (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
@@ -153,7 +160,7 @@ const MyDoc = ({ userData, workExperience }) => (
                 <Text style={styles.companyname}>{item.name}</Text>
                 <Text style={styles.companyrole}>{item.position}</Text>
                 <View>
-                  {item.achievementsAndResponsibilities.map((achievement, achievementIndex) => (
+                  {item.achievementsAndResponsibilities && item.achievementsAndResponsibilities.map((achievement, achievementIndex) => (
                     <Text style={styles.companydescription} key={achievementIndex}>• {achievement}</Text>
                   ))}
                 </View>
@@ -164,6 +171,7 @@ const MyDoc = ({ userData, workExperience }) => (
       </View>
     </Page>
   </Document>
-);
+  )
+};
 
 export default MyDoc;

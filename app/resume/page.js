@@ -7,7 +7,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 import MyDoc from './MyDoc';
 
 export default function Resume() {
-  const { userData } = useContext(UserDataContext);
+  const { userData } = useContext(UserDataContext) || {};
   console.log(userData)
 
   const router = useRouter()
@@ -36,7 +36,7 @@ export default function Resume() {
     </div>
   }
 
-  const workExperience = JSON.parse(userData.companiesInfo)
+  const workExperience = JSON.parse(userData.companiesInfo) || [];
 
     //👇🏻 function that replaces the new line with a break tag
     // const replaceWithBr = (string) => {
