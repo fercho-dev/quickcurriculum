@@ -1,6 +1,6 @@
 'use client'
 import React, { useContext, useRef } from 'react';
-import UserDataContext from '../UserDataContext';
+import UserDataContext from '../../../UserDataContext';
 import { useReactToPrint } from "react-to-print";
 import { useRouter } from 'next/navigation'
 import { PDFDownloadLink } from '@react-pdf/renderer';
@@ -114,8 +114,8 @@ export default function Resume() {
                               <h3 className='font-semibold capitalize text-base md:text-lg'>{item.name}</h3>
                               <p className='font-medium capitalize text-sm md:text-base'>{item.position}</p>
                               <ul className='list-disc'>
-                                {item.achievementsAndResponsibilities && item.achievementsAndResponsibilities.length > 0 ?
-                                  item.achievementsAndResponsibilities.map((achivement, achivementIndex) => (
+                                {item.achivementsAndResponsabilites && item.achivementsAndResponsabilites.length > 0 ?
+                                  item.achivementsAndResponsabilites.map((achivement, achivementIndex) => (
                                     <li className='text-xs md:text-sm' key={achivementIndex}>{achivement}</li>
                                   ))
                                   :
