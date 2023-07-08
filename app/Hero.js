@@ -7,7 +7,7 @@ export default function Hero() {
         </span>
       </h1>
       <p className='mb-5 text-lg md:text-2xl text-center bg-gradient-to-r from-purple-400 to-orange-400 bg-clip-text text-transparent'>
-        Genera un CV en segundos con ChatGPT
+        Genera un CV en segundos con ChatGPT - task 2
       </p>
     </div>
   )
