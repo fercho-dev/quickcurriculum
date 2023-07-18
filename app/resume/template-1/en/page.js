@@ -1,5 +1,5 @@
 'use client'
-import React, { useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import UserDataContext from '../../../UserDataContext';
 import { useReactToPrint } from "react-to-print";
 import { useRouter } from 'next/navigation'
@@ -9,6 +9,20 @@ import MyDoc from './MyDoc';
 export default function Resume() {
   const { userData } = useContext(UserDataContext) || {};
   console.log(userData)
+
+  const [workExperience, setWorkExperience] = useState([]);
+
+  useEffect(() => {
+    let newWorkExperience = [];
+
+    try {
+      newWorkExperience = JSON.parse(userData.companiesInfo);
+    } catch (error) {
+      console.error('Error parsing companiesInfo', error);
+    }
+
+    setWorkExperience(newWorkExperience);
+  }, [userData]);
 
   const router = useRouter()
   
@@ -35,8 +49,6 @@ export default function Resume() {
       </button>
     </div>
   }
-
-  const workExperience = JSON.parse(userData.companiesInfo) || [];
 
     //👇🏻 function that replaces the new line with a break tag
     // const replaceWithBr = (string) => {

@@ -3,9 +3,9 @@
 import { useRouter } from 'next/navigation'
 import React, { useState, useEffect } from "react";
 import { useChat } from 'ai/react'
-import UserDataContext from './UserDataContext';
+import UserDataContext from '../../UserDataContext';
 import LoadingSkeleton from './LoadingSkeleton';
-import getPrompts from './Model/prompts';
+import getPrompts from '../../Model/prompts';
 
 export default function Form() {
   const { messages, append, isLoading } = useChat({api: '/api/chat'})
@@ -37,9 +37,9 @@ export default function Form() {
       console.log('STOPPING CHAT')
       //stop();
       if (resumeLanguage == "english") {
-        router.push('/resume/template-1/en/');
+        router.push('/resume/template-1/en');
       } else if (resumeLanguage == "spanish") {
-        router.push('/resume/template-1/es/');
+        router.push('/resume/template-1/es');
       }
     }
   }, [messages, isLoading])
