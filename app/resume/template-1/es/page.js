@@ -1,6 +1,6 @@
 'use client'
-import React, { useContext, useRef } from 'react';
-import UserDataContext from '../UserDataContext';
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import UserDataContext from '../../../UserDataContext';
 import { useReactToPrint } from "react-to-print";
 import { useRouter } from 'next/navigation'
 import { PDFDownloadLink } from '@react-pdf/renderer';
@@ -9,6 +9,20 @@ import MyDoc from './MyDoc';
 export default function Resume() {
   const { userData } = useContext(UserDataContext) || {};
   console.log(userData)
+
+  const [workExperience, setWorkExperience] = useState([]);
+
+  useEffect(() => {
+    let newWorkExperience = [];
+
+    try {
+      newWorkExperience = JSON.parse(userData.companiesInfo);
+    } catch (error) {
+      console.error('Error parsing companiesInfo', error);
+    }
+
+    setWorkExperience(newWorkExperience);
+  }, [userData]);
 
   const router = useRouter()
   
@@ -35,8 +49,6 @@ export default function Resume() {
       </button>
     </div>
   }
-
-  const workExperience = JSON.parse(userData.companiesInfo) || [];
 
     //👇🏻 function that replaces the new line with a break tag
     // const replaceWithBr = (string) => {
@@ -65,7 +77,7 @@ export default function Resume() {
                             {userData.fullName}
                         </p>
                         <p className='text-xs md:text-base text-gray-300'>
-                            {userData.yearsOfExperience} year(s) work experience
+                            {userData.yearsOfExperience} años de experiencia
                         </p>
                     </div>
                     <div>
@@ -73,7 +85,7 @@ export default function Resume() {
                 </header>
                 <div className='w-4/5 m-auto p-8 min-h-[80vh] border-[1px] border-[#e0e0ea]'>
                     <div className='md:mx-6'>
-                        <h2 className='mb-2 text-lg md:text-3xl'>• About</h2>
+                        <h2 className='mb-2 text-lg md:text-3xl'>• Acerca</h2>
                         <p className='text-justify mb-8 text-xs md:text-lg'>
                             {userData.bio}
                         </p>
@@ -81,7 +93,7 @@ export default function Resume() {
                     <div className='flex flex-col md:flex-row md:justify-between md:mx-12'>
                       <div className='justify-self-start mb-12'>
                         <div className='mb-12'>
-                          <h2 className='mb-2 text-lg md:text-2xl'>• Technical Skills</h2>
+                          <h2 className='mb-2 text-lg md:text-2xl'>• Habilidades Técnicas</h2>
                           <ul className='list-disc ml-8'>
                             {userData.technologiesList.split(', ').map((skill, index) => (
                               <li className='capitalize text-sm md:text-base' key={index}>{skill}</li>
@@ -89,7 +101,7 @@ export default function Resume() {
                           </ul>
                         </div>
                         <div className='mb-12'>
-                          <h2 className='mb-2 text-lg md:text-2xl'>• Soft Skills</h2>
+                          <h2 className='mb-2 text-lg md:text-2xl'>• Habilidades Blandas</h2>
                             <ul className='list-disc ml-8'>
                               {userData.softSkillsList.split(', ').map((skill, index) => (
                                 <li className='capitalize text-sm md:text-base' key={index}>{skill}</li>
@@ -97,7 +109,7 @@ export default function Resume() {
                             </ul>
                         </div>
                         <div className='mb-12'>
-                          <h2 className='mb-2 text-lg md:text-2xl'>• Languages</h2>
+                          <h2 className='mb-2 text-lg md:text-2xl'>• Idiomas</h2>
                             <ul className='list-disc ml-8'>
                               {userData.languagesList.split(', ').map((skill, index) => (
                                 <li className='capitalize text-sm md:text-base' key={index}>{skill}</li>
@@ -106,7 +118,7 @@ export default function Resume() {
                         </div>
                       </div>
                       <div className='justify-self-start md:max-w-[60%]'>
-                        <h2 className='mb-2 text-lg md:text-2xl'>• Work Experience</h2>
+                        <h2 className='mb-2 text-lg md:text-2xl'>• Experiencia Laboral</h2>
                         {console.log("workexperience", workExperience)}
                         {workExperience && workExperience.length > 0 ?
                           workExperience.map((item, index) => (
@@ -114,8 +126,8 @@ export default function Resume() {
                               <h3 className='font-semibold capitalize text-base md:text-lg'>{item.name}</h3>
                               <p className='font-medium capitalize text-sm md:text-base'>{item.position}</p>
                               <ul className='list-disc'>
-                                {item.achievementsAndResponsibilities && item.achievementsAndResponsibilities.length > 0 ?
-                                  item.achievementsAndResponsibilities.map((achivement, achivementIndex) => (
+                                {item.achivementsAndResponsabilites && item.achivementsAndResponsabilites.length > 0 ?
+                                  item.achivementsAndResponsabilites.map((achivement, achivementIndex) => (
                                     <li className='text-xs md:text-sm' key={achivementIndex}>{achivement}</li>
                                   ))
                                   :

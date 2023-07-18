@@ -3,11 +3,12 @@
 import { useRouter } from 'next/navigation'
 import React, { useState, useEffect } from "react";
 import { useChat } from 'ai/react'
-import UserDataContext from './UserDataContext';
+import UserDataContext from '../../UserDataContext';
 import LoadingSkeleton from './LoadingSkeleton';
+import getPrompts from '../../Model/prompts';
 
 export default function Form() {
-  const { messages, append, stop, isLoading } = useChat({api: '/api/chat'})
+  const { messages, append, isLoading } = useChat({api: '/api/chat'})
   const [newEntry, setNewEntry] = useState(null);
   const { setUserData, userData } = React.useContext(UserDataContext);
 
@@ -35,7 +36,11 @@ export default function Form() {
 
       console.log('STOPPING CHAT')
       //stop();
-      router.push('/resume');
+      if (resumeLanguage == "english") {
+        router.push('/resume/template-1/en');
+      } else if (resumeLanguage == "spanish") {
+        router.push('/resume/template-1/es');
+      }
     }
   }, [messages, isLoading])
  
@@ -45,7 +50,7 @@ export default function Form() {
     const [currentTechnologies, setCurrentTechnologies] = useState("");
     const [softSkills, setSoftSkills] = useState("");
     const [languages, setLanguages] = useState("");
-    const [resumeLanguage, setResumeLanguage] = useState("");
+    const [resumeLanguage, setResumeLanguage] = useState("english");
     const [companyInfo, setCompanyInfo] = useState([
         { name: "", position: "" }
     ]);
@@ -76,6 +81,8 @@ export default function Form() {
         currentPosition,
         yearsOfExperience,
         currentTechnologies,
+        softSkills,
+        languages,
         workHistory, //JSON format
       } = formData;
 
@@ -89,91 +96,13 @@ export default function Form() {
           currentPosition,
           yearsOfExperience,
           currentTechnologies,
+          softSkills,
+          languages,
           workHistory: workArray,
       });
 
-      //👇🏻 loops through the items in the workArray and converts them to a string
-      const remainderText = () => {
-          let stringText = "";
-          for (let i = 0; i < workArray.length; i++) {
-              stringText += `${workArray[i].name} as a ${workArray[i].position}.\n`;
-          }
-          return stringText;
-      };
-      //👇🏻 The job description prompt
-      const prompt1 = `
-      You are an expert talent recluiter, with years of experience recluiting and hiring talent.
-
-      I am writing a resume.
-      My details are:
-      - name: ${fullName}
-      - role: ${currentPosition} (${yearsOfExperience} years) 
-      - I work with these technologies: ${currentTechnologies}
-      - My soft skills are: ${softSkills}
-      
-      Write a short description, maximum 75 words, for the top of the resume.
-      Use the necessary keywords to get the atention of recluiters and stand out, but do not overuse them.
-      (write in first person writing)
-
-      Do not use again the information I have already given you. That will be redundant.
-      
-      Avoid using any additional text, write only what I am asking for.
-      Do not use introductory text like "Sure, here is the answer..." or "Of course, this is the response..."
-      Be direct and go straight to the text I am asking for.
-      `;
-      //👇🏻 The job achievements prompt
-      const prompt2 = `
-      Now I will give you a list of the companies I have worked for and my role. 
-      Write three bullets points for each company to describe some of the experience I get from that work and enlighten my strengths. Make each bullet point be short, up to 25 words.
-      
-      ${remainderText()}
-
-      Give your response in a json format that can be translated to an javascript object.
-      Ex. [{"name": "company 1", "position": "position 1", "achivementsAndResponsabilites": ["text 1", "text 2", "text 3"]},
-      {"name": "company 2", "position": "position 2", "achivementsAndResponsabilites": ["text 1", "text 2", "text 3"]}]
-      
-      Avoid using any additional text, write only what I am asking for.
-      Do not use introductory text like "Sure, here is the answer..." or "Of course, this is the response..."
-      Be direct and go straight to the text I am asking for.
-
-      Make sure you are using the correct json format to transform to javascript object.
-      A common error is how the json ends. Make sure you are using the correct brackets and the end.
-      The normal end usually is like this: "]}]"
-      `;
-      //👇🏻 The softskills prompt
-      const prompt3 = `
-      Now I will give you a list of my soft skills.
-      If there are in spanish, please translate them to english.
-      If there are more than 5, please select the top 5.
-      If there are less than 5, please add more soft skills that are relevant for a resume.
-      This is the list: ${softSkills}
-      Give your response separated by commas. Ex. "soft skill 1, soft skill 2, soft skill 3, soft skill 4, soft skill 5"
-      Avoid using any additional text, write only what I am asking for.
-      Do not use introductory text like "Sure, here is the answer..." or "Of course, this is the response..."
-      Be direct and go straight to the text I am asking for.
-      Make sure they are five
-      `;
-      //👇🏻 The languages prompt
-      const prompt4 = `
-      Now I will give you a list of my languages.
-      This is the list: ${languages}
-      If they are in spanish, please translate them to english.
-      Give your response separated by commas. Ex. "Englsi, Spanish, French, German"
-      Avoid using any additional text, write only what I am asking for.
-      Do not use introductory text like "Sure, here is the answer..." or "Of course, this is the response..."
-      Be direct and go straight to the text I am asking for.
-      `;
-      //👇🏻 The languages prompt
-      const prompt5 = `
-      Now I will give you a list of technologies.
-      This is the list: ${currentTechnologies}
-      Make sure they are in the next format, if not please change them.
-      This is the format: "JavaScript, HTML, CSS"
-      Give your response separated by commas. Ex. "JavaScript, HTML, CSS"
-      Avoid using any additional text, write only what I am asking for.
-      Do not use introductory text like "Sure, here is the answer..." or "Of course, this is the response..."
-      Be direct and go straight to the text I am asking for.
-      `;
+      // get prompts
+      const { prompt1, prompt2, prompt3, prompt4, prompt5 } = getPrompts(resumeLanguage, formData);
 
       //👇🏻 generate a GPT result
       console.log('STARTING GPT API CALLS')
@@ -194,6 +123,8 @@ export default function Form() {
             currentPosition,
             yearsOfExperience,
             currentTechnologies,
+            softSkills,
+            languages,
             workHistory: companyInfo,
         }
         console.log('GETTTING RESUME');
