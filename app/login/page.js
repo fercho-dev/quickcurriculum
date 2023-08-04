@@ -43,7 +43,6 @@ const LoginForm = () => {
         if(data.error) {
           console.log('Error login data.error:', data);
         } else {
-          console.log('Success login:', data);
           storeAccessToken(data);
           router.push('/templates');
         }

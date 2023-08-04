@@ -51,7 +51,6 @@ const SignUpForm = () => {
         if(data.error) {
           console.log('Error signup data.error:', data);
         } else {
-          console.log('Success signup:', data);
           storeAccessToken(data);
           router.push('/templates');
         }
