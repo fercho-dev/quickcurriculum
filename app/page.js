@@ -1,7 +1,7 @@
 import Hero from './Hero'
 import Header from './Header';
 import Footer from './Footer';
-import TemplateSelector from './TemplateSelector';
+import CTA from './CTA';
 
 export default function App() {
   
@@ -9,7 +9,7 @@ export default function App() {
       <>
       <Header />
       <Hero />
-      <TemplateSelector />
+      <CTA />
       <Footer />
       {/* {messages.map(m => (
         <div key={m.id}>
