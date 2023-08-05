@@ -1,9 +1,13 @@
+'use client'
 import Form from './Form';
+import withAuth from '../../hoc/withAuth';
 
-export default function Page() {
+function Template2() {
     return (
       <>
       <Form />
     </>
     );
 }
+
+export default withAuth(Template2);
