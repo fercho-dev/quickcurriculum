@@ -29,26 +29,24 @@ const LoginForm = () => {
     }
 
     if (Object.keys(formErrors).length === 0) {
-      console.log(email.trim(), password); // trim email before use
       // Implement your login logic here
       fetch('/api/firebase/users/login', {
         method: 'POST',
         body: JSON.stringify({ email: email.trim(), password }),
       })
       .then(response => {
-        console.log(response);
         return response.json()
       })
       .then(data => {
         if(data.error) {
-          console.log('Error login data.error:', data);
+          alert(`Error login: ${data.code}`);
         } else {
           storeAccessToken(data);
           router.push('/templates');
         }
       })
       .catch((error) => {
-        console.error('Error login:', error);
+        alert(`Error login: ${error}`);
       });
     } else {
       setErrors(formErrors);

@@ -36,27 +36,24 @@ const SignUpForm = () => {
     }
 
     if (Object.keys(formErrors).length === 0) {
-      // No validation errors
-      console.log(email, password);
       // Implement your sign-up logic here
       fetch('/api/firebase/users/signup', {
         method: 'POST',
         body: JSON.stringify({ email: email.trim(), password }),
       })
       .then(response => {
-        console.log(response);
         return response.json()
       })
       .then(data => {
         if(data.error) {
-          console.log('Error signup data.error:', data);
+          alert(`Error signup: ${data.code}`);
         } else {
           storeAccessToken(data);
           router.push('/templates');
         }
       })
       .catch((error) => {
-        console.error('Error signup:', error);
+        alert(`Error signup: ${error}`);
       });
     } else {
       // There are validation errors, update the state
