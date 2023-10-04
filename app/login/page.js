@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { storeAccessToken } from '../localStorage/localStorageUtils.js';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link.js';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../../lib/firebase-config'
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -30,24 +32,15 @@ const LoginForm = () => {
 
     if (Object.keys(formErrors).length === 0) {
       // Implement your login logic here
-      fetch('/api/firebase/users/login', {
-        method: 'POST',
-        body: JSON.stringify({ email: email.trim(), password }),
-      })
-      .then(response => {
-        return response.json()
-      })
-      .then(data => {
-        if(data.error) {
-          alert(`Error login: ${data.code}`);
-        } else {
-          storeAccessToken(data);
-          router.push('/templates');
-        }
-      })
-      .catch((error) => {
-        alert(`Error login: ${error}`);
-      });
+      signInWithEmailAndPassword(auth, email.trim(), password)
+        .then(userCredential => {
+          const user = userCredential.user
+          storeAccessToken(user);
+          router.push('/templates')
+        })
+        .catch(error => {
+          alert(`Login failed: ${error.message} - ${error.code}`)
+        })
     } else {
       setErrors(formErrors);
     }

@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { storeAccessToken } from '../localStorage/localStorageUtils.js';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link.js';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth} from "../../lib/firebase-config";
 
 const SignUpForm = () => {
   const [email, setEmail] = useState('');
@@ -37,24 +39,15 @@ const SignUpForm = () => {
 
     if (Object.keys(formErrors).length === 0) {
       // Implement your sign-up logic here
-      fetch('/api/firebase/users/signup', {
-        method: 'POST',
-        body: JSON.stringify({ email: email.trim(), password }),
-      })
-      .then(response => {
-        return response.json()
-      })
-      .then(data => {
-        if(data.error) {
-          alert(`Error signup: ${data.code}`);
-        } else {
-          storeAccessToken(data);
+      createUserWithEmailAndPassword(auth, email.trim(), password)
+        .then(userCredential => {
+          const user = userCredential.user
+          storeAccessToken(user);
           router.push('/templates');
-        }
-      })
-      .catch((error) => {
-        alert(`Error signup: ${error}`);
-      });
+        })
+        .catch(error => {
+          alert(`Sign up failed: ${error.message} - ${error.code}`)
+        })
     } else {
       // There are validation errors, update the state
       setErrors(formErrors);
