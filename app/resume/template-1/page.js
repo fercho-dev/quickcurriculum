@@ -1,6 +1,5 @@
 'use client'
 import Form from './Form';
-import withAuth from '../../hoc/withAuth';
 
 function Template1() {
     return (
@@ -10,4 +9,4 @@ function Template1() {
     );
 }
 
-export default withAuth(Template1);
+export default Template1;

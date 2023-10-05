@@ -1,12 +1,34 @@
 'use client'
-import React, { useState } from 'react';
-import { storeAccessToken } from '../localStorage/localStorageUtils.js';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link.js';
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../lib/firebase-config'
+import { signInWithEmailAndPassword, getRedirectResult, signInWithRedirect } from "firebase/auth";
+import { auth, provider } from '../../lib/firebase-config'
 
 const LoginForm = () => {
+  useEffect(() => {
+    getRedirectResult(auth).then(async (userCred) => {
+      if (!userCred) {
+        return;
+      }
+
+      fetch("/api/loginwithgoogle", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${await userCred.user.getIdToken()}`,
+        },
+      }).then((response) => {
+        if (response.status === 200) {
+          router.push("/templates");
+        }
+      });
+    });
+  }, []);
+
+  function loginWithGoogle() {
+    signInWithRedirect(auth, provider);
+  }
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -33,10 +55,17 @@ const LoginForm = () => {
     if (Object.keys(formErrors).length === 0) {
       // Implement your login logic here
       signInWithEmailAndPassword(auth, email.trim(), password)
-        .then(userCredential => {
-          const user = userCredential.user
-          storeAccessToken(user);
-          router.push('/templates')
+        .then(async (userCred) => {
+          fetch("/api/loginwithemail", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${await userCred.user.getIdToken()}`,
+            },
+          }).then((response) => {
+            if (response.status === 200) {
+              router.push("/templates");
+            }
+          })
         })
         .catch(error => {
           alert(`Login failed: ${error.message} - ${error.code}`)
@@ -86,6 +115,8 @@ const LoginForm = () => {
       <div>
         <p className='text-slate-600'>¿Aún no tienes cuenta? <Link className='cursor-pointer underline' href="/signup">Registrate</Link></p>
       </div>
+
+      <button className='my-6 underline' onClick={() => loginWithGoogle()}>Iniciar sesión con Google</button>
     </div>
   );
 };
