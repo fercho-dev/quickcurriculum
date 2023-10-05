@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request) {
   //Remove the value and expire the cookie
   const options = {
-    name: "session",
+    name: process.env.COOKIE_SESSION_NAME,
     value: "",
     maxAge: -1,
   };
