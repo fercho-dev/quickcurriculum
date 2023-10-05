@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function middleware(request, response) {
 
-  const session = request.cookies.get("session");
+  const session = request.cookies.get(process.env.COOKIE_SESSION_NAME);
 
   //Return to /login if don't have a session
   if (!session) {
@@ -12,9 +12,9 @@ export async function middleware(request, response) {
   }
 
   //Call the authentication endpoint
-  const responseAPI = await fetch(`${request.nextUrl.origin}/api/loginwithgoogle`, {
+  const responseAPI = await fetch(`${request.nextUrl.origin}/api/auth`, {
     headers: {
-      Cookie: `session=${session?.value}`,
+      Cookie: `${process.env.COOKIE_SESSION_NAME}=${session?.value}`,
     },
   });
 

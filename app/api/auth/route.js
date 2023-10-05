@@ -19,7 +19,7 @@ export async function POST(request, response) {
         expiresIn,
       });
       const options = {
-        name: "session",
+        name: process.env.COOKIE_SESSION_NAME,
         value: sessionCookie,
         maxAge: expiresIn,
         httpOnly: true,
@@ -36,7 +36,7 @@ export async function POST(request, response) {
 
 // authenticate user
 export async function GET(request) {
-  const session = cookies().get("session")?.value || "";
+  const session = cookies().get(process.env.COOKIE_SESSION_NAME)?.value || "";
 
   //Validate if the cookie exist in the request
   if (!session) {

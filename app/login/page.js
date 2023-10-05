@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link.js';
-import { signInWithEmailAndPassword, getRedirectResult, signInWithRedirect } from "firebase/auth";
+import { getRedirectResult, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from '../../lib/firebase-config'
+import { emailPasswordAuth } from '../../lib/firebase-utils'
 
 const LoginForm = () => {
   useEffect(() => {
@@ -11,17 +12,7 @@ const LoginForm = () => {
       if (!userCred) {
         return;
       }
-
-      fetch("/api/loginwithgoogle", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${await userCred.user.getIdToken()}`,
-        },
-      }).then((response) => {
-        if (response.status === 200) {
-          router.push("/templates");
-        }
-      });
+      emailPasswordAuth(undefined, undefined, router, false, true, userCred)
     });
   }, []);
 
@@ -54,22 +45,7 @@ const LoginForm = () => {
 
     if (Object.keys(formErrors).length === 0) {
       // Implement your login logic here
-      signInWithEmailAndPassword(auth, email.trim(), password)
-        .then(async (userCred) => {
-          fetch("/api/loginwithemail", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${await userCred.user.getIdToken()}`,
-            },
-          }).then((response) => {
-            if (response.status === 200) {
-              router.push("/templates");
-            }
-          })
-        })
-        .catch(error => {
-          alert(`Login failed: ${error.message} - ${error.code}`)
-        })
+      emailPasswordAuth(email.trim(), password, router, false, false, undefined)
     } else {
       setErrors(formErrors);
     }

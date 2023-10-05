@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link.js';
-import { createUserWithEmailAndPassword, getRedirectResult, signInWithRedirect } from "firebase/auth";
+import { getRedirectResult, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from "../../lib/firebase-config";
+import { emailPasswordAuth } from '../../lib/firebase-utils'
 
 const SignUpForm = () => {
   useEffect(() => {
@@ -11,17 +12,7 @@ const SignUpForm = () => {
       if (!userCred) {
         return;
       }
-
-      fetch("/api/loginwithgoogle", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${await userCred.user.getIdToken()}`,
-        },
-      }).then((response) => {
-        if (response.status === 200) {
-          router.push("/templates");
-        }
-      });
+      emailPasswordAuth(undefined, undefined, router, true, true, userCred)
     });
   }, []);
 
@@ -61,22 +52,7 @@ const SignUpForm = () => {
 
     if (Object.keys(formErrors).length === 0) {
       // Implement your sign-up logic here
-      createUserWithEmailAndPassword(auth, email.trim(), password)
-        .then(async (userCred) => {
-          fetch("/api/loginwithemail", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${await userCred.user.getIdToken()}`,
-            },
-          }).then((response) => {
-            if (response.status === 200) {
-              router.push("/templates");
-            }
-          })
-        })
-        .catch(error => {
-          alert(`Sign up failed: ${error.message} - ${error.code}`)
-        })
+      emailPasswordAuth(email.trim(), password, router, true, false, undefined)
     } else {
       // There are validation errors, update the state
       setErrors(formErrors);
