@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link.js';
 import { getRedirectResult, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from "../../lib/firebase-config";
-import { emailPasswordAuth } from '../../lib/firebase-utils'
+import { getAuth } from '../../lib/firebase-utils'
 
 const SignUpForm = () => {
   useEffect(() => {
@@ -12,7 +12,7 @@ const SignUpForm = () => {
       if (!userCred) {
         return;
       }
-      emailPasswordAuth(undefined, undefined, router, true, true, userCred)
+      getAuth(undefined, undefined, router, true, true, userCred)
     });
   }, []);
 
@@ -52,7 +52,7 @@ const SignUpForm = () => {
 
     if (Object.keys(formErrors).length === 0) {
       // Implement your sign-up logic here
-      emailPasswordAuth(email.trim(), password, router, true, false, undefined)
+      getAuth(email.trim(), password, router, true, false, undefined)
     } else {
       // There are validation errors, update the state
       setErrors(formErrors);

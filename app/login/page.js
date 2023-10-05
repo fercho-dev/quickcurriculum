@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link.js';
 import { getRedirectResult, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from '../../lib/firebase-config'
-import { emailPasswordAuth } from '../../lib/firebase-utils'
+import { getAuth } from '../../lib/firebase-utils'
 
 const LoginForm = () => {
   useEffect(() => {
@@ -12,7 +12,7 @@ const LoginForm = () => {
       if (!userCred) {
         return;
       }
-      emailPasswordAuth(undefined, undefined, router, false, true, userCred)
+      getAuth(undefined, undefined, router, false, true, userCred)
     });
   }, []);
 
@@ -45,7 +45,7 @@ const LoginForm = () => {
 
     if (Object.keys(formErrors).length === 0) {
       // Implement your login logic here
-      emailPasswordAuth(email.trim(), password, router, false, false, undefined)
+      getAuth(email.trim(), password, router, false, false, undefined)
     } else {
       setErrors(formErrors);
     }
