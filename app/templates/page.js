@@ -1,6 +1,5 @@
 'use client'
 import TemplateSelector from "./TemplateSelector";
-import withAuth from "../hoc/withAuth";
 
 function Templates() {
   return (
@@ -8,4 +7,4 @@ function Templates() {
   );
 }
 
-export default withAuth(Templates);
+export default Templates;

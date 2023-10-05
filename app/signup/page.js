@@ -1,10 +1,25 @@
 'use client'
-import React, { useState } from 'react';
-import { storeAccessToken } from '../localStorage/localStorageUtils.js';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link.js';
+import { getRedirectResult, signInWithRedirect } from "firebase/auth";
+import { auth, provider } from "../../lib/firebase-config";
+import { getAuth } from '../../lib/firebase-utils'
 
 const SignUpForm = () => {
+  useEffect(() => {
+    getRedirectResult(auth).then(async (userCred) => {
+      if (!userCred) {
+        return;
+      }
+      getAuth(undefined, undefined, router, true, true, userCred)
+    });
+  }, []);
+
+  function loginWithGoogle() {
+    signInWithRedirect(auth, provider);
+  }
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -37,24 +52,7 @@ const SignUpForm = () => {
 
     if (Object.keys(formErrors).length === 0) {
       // Implement your sign-up logic here
-      fetch('/api/firebase/users/signup', {
-        method: 'POST',
-        body: JSON.stringify({ email: email.trim(), password }),
-      })
-      .then(response => {
-        return response.json()
-      })
-      .then(data => {
-        if(data.error) {
-          alert(`Error signup: ${data.code}`);
-        } else {
-          storeAccessToken(data);
-          router.push('/templates');
-        }
-      })
-      .catch((error) => {
-        alert(`Error signup: ${error}`);
-      });
+      getAuth(email.trim(), password, router, true, false, undefined)
     } else {
       // There are validation errors, update the state
       setErrors(formErrors);
@@ -101,6 +99,8 @@ const SignUpForm = () => {
       <div>
         <p className='text-slate-600'>¿Ya tienes cuenta? <Link className='cursor-pointer underline' href="/login">Inicia Sesión</Link></p>
       </div>
+
+      <button className='my-6 underline' onClick={() => loginWithGoogle()}>Registrarse con Google</button>
     </div>
   );
 };
